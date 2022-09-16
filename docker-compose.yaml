@@ -1,0 +1,51 @@
+version: '3.9'
+
+services:
+
+  postgres:
+    image: postgres:12.4-alpine
+    restart: always
+    env_file:
+      - source/.env
+    volumes:
+      - pg_data_todolist:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - backend_nw
+    healthcheck:
+      test: pg_isready -U andrey -d todolist
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+#  api:
+#    build:
+#      context: .
+#    restart: always
+#    env_file:
+#      - .env
+#    environment:
+#      POSTGRES_HOST: postgres
+#    depends_on:
+#      postgres:
+#        condition: service_healthy
+#      migrations:
+#        condition: service_completed_successfully
+#    command: >
+#      sh -c "python manage.py runserver 0.0.0.0:8000"
+#    ports:
+#      - "8000:8000"
+#    networks:
+#      - backend_nw
+#      - frontend_nw
+
+
+volumes:
+  pg_data_todolist:
+
+networks:
+  backend_nw:
+    driver: bridge
+#  frontend_nw:
+#    driver: bridge
