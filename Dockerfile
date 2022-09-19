@@ -9,10 +9,7 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=on \
     POETRY_VERSION=1.2.0
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-#    gcc \
     curl \
-#    build-essential \
-#    libpq-dev \
     && apt-get autoclean && apt-get autoremove \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
     && pip install "poetry==$POETRY_VERSION"
@@ -25,4 +22,4 @@ RUN poetry config virtualenvs.create false \
 
 COPY source/ .
 
-# ENTRYPOINT ["bash", "entrypoint.sh"]
+ENTRYPOINT ["bash", "entrypoint.sh"]

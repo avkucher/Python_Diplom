@@ -6,7 +6,7 @@ services:
     image: postgres:12.4-alpine
     restart: always
     env_file:
-      - source/.env
+      - .env
     volumes:
       - pg_data_todolist:/var/lib/postgresql/data
     healthcheck:
@@ -21,17 +21,16 @@ services:
   api:
     build:
       context: .
+      dockerfile: Dockerfile
     restart: always
     env_file:
-      - source/.env
+      - .env
     environment:
       POSTGRES_HOST: postgres
     depends_on:
       postgres:
         condition: service_healthy
-#      migrations:
-#        condition: service_completed_successfully
-    command: sh -c "python3 manage.py runserver 0.0.0.0:8000"
+    command: python3 manage.py runserver 0.0.0.0:8000
     ports:
       - "8000:8000"
     healthcheck:
