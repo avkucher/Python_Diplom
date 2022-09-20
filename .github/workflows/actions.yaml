@@ -38,12 +38,12 @@ jobs:
   deploy:
     runs-on: ubuntu-22.04
     needs: build
-#    env:
-#      ANSIBLE_VAULT_PASSWORD_FILE: /tmp/.vault_pass.txt
+    env:
+      ANSIBLE_VAULT_PASSWORD_FILE: /tmp/.vault_pass.txt
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Data assembly
+      - name: Render template
         run: |
           echo "${{ secrets.VAULT_PASSWORD }}" > /tmp/.vault_pass.txt
           ansible-vault decrypt deploy/.env --output deploy/.env
