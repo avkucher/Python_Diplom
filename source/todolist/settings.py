@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 import os
 from pathlib import Path
-# from typing import Any
+from typing import Any
 
 import environ
 
@@ -20,13 +20,18 @@ env = environ.Env(
     DEBUG=(bool, False)
 )
 
+# READ_DOT_ENV_FILE = True
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+ROOT_DIR = environ.Path(__file__) - 3
+
 # Take environment variables from .env file
 environ.Env.read_env(BASE_DIR.joinpath('.env'))
-# environ.Env.read_env(ROOT_DIR + '.env')
+environ.Env.read_env(ROOT_DIR + '.env')
+
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -51,6 +56,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'social_django',
     'core',
 ]
 
@@ -62,6 +69,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
 ROOT_URLCONF = 'todolist.urls'
@@ -143,3 +151,75 @@ STATIC_ROOT = BASE_DIR.parent.joinpath('deploy', 'nginx', 'static')
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+LOGGING: dict[str, Any] = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'health-check': {
+            '()': 'todolist.filters.HealthCheckFilter',
+        },
+    },
+    'formatters': {
+        'console': {
+            'format': '%(asctime)s - %(levelname)s - %(message)s',
+            'datefmt': '%Y-%m--%d %H:%M:%S',
+        },
+        'sample': {
+            'format': '%(asctime)s - %(levelname)s - %(module)s - %(message)s',
+            'datefmt': '%Y-%m--%d %H:%M:%S',
+        }
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'filters': ['health-check'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'console',
+        },
+        'project': {
+            'level': 'DEBUG',
+            'filters': ['health-check'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'sample',
+        },
+    },
+    'loggers': {
+        '': {
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'handlers': ['project'],
+        },
+        'django.server': {
+            'level': 'INFO',
+            'handlers': ['console'],
+        },
+    }
+}
+
+if env.bool('SQL_ECHO', False):
+    LOGGING['loggers'].update({
+        'django.db': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': False
+        }
+    })
+
+SOCIAL_AUTH_JSONFIELD_ENABLED = True
+SOCIAL_AUTH_VK_OAUTH2_KEY = env.str('VK_OAUTH2_KEY')
+SOCIAL_AUTH_VK_OAUTH2_SECRET = env.str('VK_OAUTH2_SECRET')
+
+SOCIAL_AUTH_URL_NAMESPACE = 'social'
+
+SOCIAL_AUTH_VK_OAUTH2_SCOPE = ['email']
+SOCIAL_AUTH_VK_EXTRA_DATA = [('email', 'email')]
+
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/logged-in/'
+SOCIAL_AUTH_LOGIN_ERROR_URL = '/login-error/'
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.vk.VKOAuth2',  # бекенд авторизации через ВК
+    'django.contrib.auth.backends.ModelBackend',
+    # бекенд классической аутентификации, чтобы работала авторизация через обычный логин и пароль
+)
