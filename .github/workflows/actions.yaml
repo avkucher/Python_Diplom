@@ -52,6 +52,7 @@ jobs:
             -v $(pwd)/deploy/nginx/static/:/opt/todolist/static/:rw \
             ${{ secrets.DOCKER_HUB_USERNAME }}/todolist:latest \
             python manage.py collectstatic -c --no-input
+
       - name: Copy on server
         uses: appleboy/scp-action@master
         with:
