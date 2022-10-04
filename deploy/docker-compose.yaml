@@ -27,6 +27,8 @@ services:
       postgres:
         condition: service_healthy
     command: python3 manage.py runserver 0.0.0.0:8000
+    expose:
+      - 8000
     healthcheck:
       test: curl -sS http://127.0.0.1:8000/ping/ || exit 1
       interval: 3s
@@ -36,9 +38,8 @@ services:
       - backend_nw
       - frontend_nw
 
-
   frontend:
-    image: sermalenk/skypro-front:lesson-35
+    image: sermalenk/skypro-front:lesson-36
     restart: always
     ports:
       - "80:80"

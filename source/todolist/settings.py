@@ -9,13 +9,10 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-import os
 from pathlib import Path
 from typing import Any
-
-
-
 import environ
+
 
 env = environ.Env(
     # set casting, default value
@@ -59,8 +56,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_filters',
     'social_django',
     'core',
+    'goals',
 ]
 
 MIDDLEWARE = [
@@ -154,6 +153,10 @@ STATIC_ROOT = BASE_DIR.parent.joinpath('deploy', 'nginx', 'static')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend', ]
+}
 
 LOGGING: dict[str, Any] = {
     'version': 1,
