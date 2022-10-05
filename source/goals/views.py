@@ -1,3 +1,4 @@
+from django.db import transaction
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions, filters
 from django.db.models import Q
@@ -35,14 +36,17 @@ class GoalCategoryView(generics.RetrieveUpdateDestroyAPIView):
         return GoalCategory.objects.filter(user_id=self.request.user.id, is_deleted=False)
 
     def perform_destroy(self, instance: GoalCategory):
-        instance.is_deleted = True
-        instance.save(update_fields=('is_deleted',))
+        with transaction.atomic():
+            instance.is_deleted = True
+            instance.save(update_fields=('is_deleted',))
+            Goal.objects.filter(category=instance).update(status=Goal.Status.archived)
         return instance
 
 
 class GoalCreateView(generics.CreateAPIView):
-    permission_classes = [permissions.IsAuthenticated]
     serializer_class = GoalCreateSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
 
 
 class GoalListView(generics.ListAPIView):

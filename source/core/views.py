@@ -16,8 +16,9 @@ class LoginView(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        login(request=request, user=serializer.save())
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        user = serializer.save()
+        login(request=request, user=user)
+        return Response(ProfileSerializer(user).data)
 
 
 class ProfileView(generics.RetrieveUpdateDestroyAPIView):
