@@ -30,9 +30,6 @@ ROOT_DIR = environ.Path(__file__) - 3
 environ.Env.read_env(BASE_DIR.joinpath('.env'))
 environ.Env.read_env(ROOT_DIR + '.env')
 
-
-
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
