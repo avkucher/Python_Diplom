@@ -76,7 +76,7 @@ class GoalCategoryView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = GoalCategorySerializer
 
     def get_queryset(self):
-        return GoalCategory.objects.prefetch_related('board__participants').filter(
+        return GoalCategory.objects.prefetch_related('participants').filter(
             board__participants__user_id=self.request.user.id,
             is_deleted=False
         )
