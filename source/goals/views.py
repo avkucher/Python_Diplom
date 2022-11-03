@@ -12,7 +12,7 @@ from goals.serializers import GoalCategoryCreateSerializer, GoalCategorySerializ
 
 
 class BoardCreateView(generics.CreateAPIView):
-    permission_classes = [BoardPermission]
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = BoardCreateSerializer
 
 
@@ -20,10 +20,13 @@ class BoardListView(generics.ListAPIView):
     model = Board
     permission_classes = [BoardPermission]
     serializer_class = BoardListSerializer
-    ordering = ['title']
+    # ordering = ['title']
 
     def get_queryset(self):
-        return Board.objects.filter(participants__user_id=self.request.user.id, is_deleted=False)
+        return Board.objects.prefetch_related('participants').filter(
+            participants__user_id=self.request.user.id,
+            is_deleted=False
+        )
 
 
 class BoardView(generics.RetrieveUpdateDestroyAPIView):
