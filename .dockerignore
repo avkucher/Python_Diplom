@@ -1,5 +1,6 @@
 .env
 Dockerfile
 source/static
-source/**/tests
+source/core/tests
+source/goals/tests
 source/**/test*.py
