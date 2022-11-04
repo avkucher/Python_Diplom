@@ -20,6 +20,8 @@ class BoardListView(generics.ListAPIView):
     model = Board
     permission_classes = [BoardPermission]
     serializer_class = BoardListSerializer
+    # filter_backends = [filters.OrderingFilter]
+    # ordering_fields = ['title']
     # ordering = ['title']
 
     def get_queryset(self):

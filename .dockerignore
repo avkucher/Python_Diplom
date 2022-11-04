@@ -1,6 +1,5 @@
 .env
 Dockerfile
-source/static
-source/core/tests
-source/goals/tests
-source/**/test*.py
+deploy/**/static
+source/goals/tests/test_board.py
+source/core/tests.py
